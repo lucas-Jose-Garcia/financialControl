@@ -2,13 +2,21 @@ const transactionUl = document.querySelector('#transactions')
 const incomeDisplay = document.querySelector('#money-plus')
 const expenseDisplay = document.querySelector('#money-minus')
 const balanceDisplay = document.querySelector('#balance')
+const form = document.querySelector('#form')
+const inputTransactionName = document.querySelector('#text')
+const inputTransactionAmount = document.querySelector('#amount')
 
-const dummyTransaction = [
+let dummyTransaction = [
     { id: 1, name: 'Bolo de brigadeiro', amount: -20},
     { id: 2, name: 'Salário', amount: 300},
     { id: 3, name: 'Torta de Frango', amount: -10},
     { id: 4, name: 'Aula de Violão', amount: 150}
 ]
+
+removeTransaction = ID => {
+    dummyTransaction = dummyTransaction.filter(transaction => transaction.id !== ID)
+    init()
+}
 
 const addTransactionIntoDOM = transaction => {
     const operator = transaction.amount < 0 ? '-' : '+'
@@ -18,13 +26,16 @@ const addTransactionIntoDOM = transaction => {
 
     li.classList.add(CSSClass)
     li.innerHTML = `
-        ${transaction.name} <span>${operator} R$ ${amountWithoutOperator}</span><button class="delete-btn">x</button>
+        ${transaction.name}
+        <span>${operator} R$ ${amountWithoutOperator}</span>
+        <button class="delete-btn" onClick = "removeTransaction(${transaction.id})">
+        x
+        </button>
     `
 
     transactionUl.append(li)
 
 }
-
 
 const updateBalanceValue = () => {
     const transactionAmounts = dummyTransaction
@@ -47,8 +58,36 @@ const updateBalanceValue = () => {
 }
 
 const init = () => {
+    transactionUl.innerHTML = ''
     dummyTransaction.forEach(addTransactionIntoDOM)
     updateBalanceValue()
 }
 
 init()
+
+const genarateID = () => Math.round(Math.random() * 1000)
+
+form.addEventListener('submit', event => {
+    event.preventDefault()
+
+    const transactionName = inputTransactionName.value.trim()
+    const transactionAmount = inputTransactionAmount.value.trim() 
+
+    if (transactionName === '' || transactionAmount === '') {
+        alert('Por favor preencha o nome e o valor da transação!')
+        return
+    }
+
+    const transaction = {
+        id: genarateID(),
+        name: transactionName,
+        amount: Number(transactionAmount)
+    }
+
+    dummyTransaction.push(transaction)
+    init()
+
+    inputTransactionName.value = ''
+    inputTransactionAmount.value = ''
+
+})
